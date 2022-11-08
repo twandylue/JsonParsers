@@ -5,6 +5,21 @@ function JsonParser(str) {
   expectEndOfInput();
   return value;
 
+  function parseValue() {
+    skipWhitespace();
+    const value =
+      parseString() ??
+      parseNumber() ??
+      parseArray() ??
+      parseObject() ??
+      parseKeyword('true', true) ??
+      parseKeyword('false', false) ??
+      parseKeyword('null', null);
+    skipWhitespace();
+
+    return value;
+  }
+
   function parseObject() {
     if (str[i] === "{") {
       i++;
@@ -51,21 +66,6 @@ function JsonParser(str) {
       i++;
       return result;
     }
-  }
-
-  function parseValue() {
-    skipWhitespace();
-    const value =
-      parseString() ??
-      parseNumber() ??
-      parseArray() ??
-      parseObject() ??
-      parseKeyword('true', true) ??
-      parseKeyword('false', false) ??
-      parseKeyword('null', null);
-    skipWhitespace();
-
-    return value;
   }
 
   function parseString() {
@@ -230,7 +230,7 @@ For example:
 For example:
 ${cur_num}
 ${" ".repeat(cur_num.length)}^`);
-      throw new Error("JSON_ERROR_0006 Expecting a digit")
+      throw new Error("JSON_ERROR_0006 Expecting a digit");
     }
   }
 
@@ -270,8 +270,10 @@ ${" ".repeat(cur_str.length + 1)}^^^^^^`);
 // Fail cases:
 // printCase("-");
 // printCase("-1.");
+// printCase("-0");
 // printCase("1e");
-// printCase("-1e-2.2");
+printCase("-1e-2.2");
+printCase('{ "key": -1e-2.2}');
 // printCase("{");
 // printCase("{}{");
 // printCase('{"a"');
@@ -284,7 +286,7 @@ ${" ".repeat(cur_str.length + 1)}^^^^^^`);
 // printCase("[[]");
 // printCase('["]');
 printCase('{ "data": { "fish": "cake", "array": [1,2,3], "children": [ { "something": "else" }, { "candy": "cane" }, { "sponge": "bob" } ] } } ');
-printCase('{ "data": "test" } ');
+// printCase('{ "data": "test" } ');
 
 function printCase(json) {
   try {

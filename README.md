@@ -4,7 +4,7 @@ Json parser implementation without extoic modules in different languages.
 
 ## TODOs
 
-- [ ] JavaScript
+- [x] JavaScript
 - [ ] Lua
 - [ ] Python
 - [ ] Rust
