@@ -21,9 +21,8 @@ function JsonParser(str) {
           expectObjectKey();
         }
 
-        // TODO: check sequence of skipWhitespace() and eatColon();
-        skipWhitespace();
         eatColon();
+        skipWhitespace();
         const value = parseValue();
         result[key] = value;
         init = false;
@@ -285,6 +284,7 @@ ${" ".repeat(cur_str.length + 1)}^^^^^^`);
 // printCase("[[]");
 // printCase('["]');
 printCase('{ "data": { "fish": "cake", "array": [1,2,3], "children": [ { "something": "else" }, { "candy": "cane" }, { "sponge": "bob" } ] } } ');
+printCase('{ "data": "test" } ');
 
 function printCase(json) {
   try {
