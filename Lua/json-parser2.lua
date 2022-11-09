@@ -3,6 +3,11 @@ local json = {}
 local function encode_table(val, stack)
   local res = {}
   stack = stack or {}
+
+  if stack[val] then
+    error("circle reference")
+  end
+
   stack[val] = true
   -- if rawget(val, 1) ~= nil or next(val) == nil then
   if #val ~= 0 or next(val) == nil then
@@ -35,6 +40,7 @@ end
 
 local function encode_string(val)
   return tostring(val)
+  -- TODO:
   -- return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
 end
 
@@ -45,8 +51,12 @@ local function encode_number(val)
   return string.format("%.14g", val)
 end
 
+local function encode_nil(val)
+  return "null"
+end
+
 local type_func_map = {
-  -- ["nil"] = encode_nil,
+  ["nil"] = encode_nil,
   ["table"] = encode_table,
   ["string"] = encode_string,
   ["number"] = encode_number,
