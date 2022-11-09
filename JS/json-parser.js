@@ -104,7 +104,8 @@ function JsonParser(str) {
             }
           } else {
             expectEscapeCharacter(result);
-            result += str[i];
+            // TODO: could remove?
+            // result += str[i];
           }
         } else {
           result += str[i];
@@ -272,8 +273,8 @@ ${" ".repeat(cur_str.length + 1)}^^^^^^`);
 // printCase("-1.");
 // printCase("-0");
 // printCase("1e");
-printCase("-1e-2.2");
-printCase('{ "key": -1e-2.2}');
+// printCase("-1e-2.2");
+// printCase('{ "key": -1e-2.2}');
 // printCase("{");
 // printCase("{}{");
 // printCase('{"a"');
@@ -285,8 +286,9 @@ printCase('{ "key": -1e-2.2}');
 // printCase("[][");
 // printCase("[[]");
 // printCase('["]');
-printCase('{ "data": { "fish": "cake", "array": [1,2,3], "children": [ { "something": "else" }, { "candy": "cane" }, { "sponge": "bob" } ] } } ');
+// printCase('{ "data": { "fish": "cake", "array": [1,2,3], "children": [ { "something": "else" }, { "candy": "cane" }, { "sponge": "bob" } ] } } ');
 // printCase('{ "data": "test" } ');
+printCase('{"key": "\u0061" }');
 
 function printCase(json) {
   try {
