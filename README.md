@@ -1,4 +1,4 @@
-# JsonPasers
+# JsonParsers
 
 Json parser implementation without extoic modules in different languages.
 
@@ -12,3 +12,4 @@ Json parser implementation without extoic modules in different languages.
 ## References
 
 - [JSON Parser with JavaScript](https://lihautan.com/json-parser-with-javascript/)
+- [Introducing JSON](https://www.json.org/json-en.html)
