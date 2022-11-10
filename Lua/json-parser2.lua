@@ -155,13 +155,52 @@ local function parse_array(str, i)
     i = next_char(str, i, space_chars, true)
 
     local char = string.sub(str, i, i)
-    i = i + 1
     if char == "]" then
+      i = i + 1
       break
     end
     if char ~= "," then
       decode_error(str, i, "expected ']' or ','")
     end
+    i = i + 1
+  end
+
+  return res, i
+end
+
+-- TODO: parse_object
+local function parse_object(str, i)
+  local res = {}
+  i = i + 1
+  while true do
+    local key
+    local value
+    i = next_char(str, i, space_chars, true)
+    -- empty object
+    if string.sub(str, i, i) == "}" then
+      i = i + 1
+      break
+    end
+    if string.sub(str, i, i) ~= '"' then
+      decode_error(str, i, "expected string for key")
+    end
+    key, i = parse(str, i)
+    i = next_char(str, i, space_chars, true)
+    if string.sub(str, i, i) ~= ":" then
+      decode_error(str, i, "expected ':' after key")
+    end
+    i = i + 1
+    i = next_char(str, i, space_chars, true)
+    value, i = parse(str, i)
+    res[key] = value
+    if string.sub(str, i, i) == "}" then
+      i = i + 1
+      break
+    end
+    if string.sub(str, i, i) ~= "," then
+      decode_error(str, i, "expected '}' or ','")
+    end
+    i = i + 1
   end
 
   return res, i
