@@ -72,15 +72,146 @@ encode = function(val, stack)
   error("unexpected type '" .. t .. "'")
 end
 
+local parse
+
+local literal_map = {
+  ["true"] = true,
+  ["false"] = false,
+  ["null"] = nil,
+}
+
+local function next_char(str, idx, set, negate)
+  for i = idx, #str do
+    if set[string.sub(str, i, i)] ~= negate then
+      return i
+    end
+  end
+  return #str + 1
+end
+
+local function decode_error(str, idx, message)
+  local line_count = 1
+  local col_count = 1
+  for i = 1, idx - 1 do
+    col_count = col_count + 1
+    if string.sub(str, i, i) == "\n" then
+      line_count = line_count + 1
+      col_count = col_count + 1
+    end
+  end
+  error(string.format("%s at line %d col %d", message, line_count, col_count))
+end
+
+local function create_set(list)
+  local res = {}
+  for i = 1, #list do
+    res[list[i]] = true
+  end
+
+  return res
+end
+
+local space_chars = create_set({ " ", "\t", "\r", "\n" })
+local escape_chars = create_set({ "\\", "/", '"', "b", "f", "n", "r", "t", "u" })
+local literals = create_set({ "null", "true", "false" })
+local delim_chars = create_set({ " ", "\t", "\r", "\n", "]", "}", "," })
+
+local function parse_number(str, i)
+  local x = next_char(str, i, delim_chars)
+  local s = string.sub(str, i, x - 1)
+  local num = tonumber(s)
+  if not num then
+    decode_error(str, i, "invalid number '" .. s .. "'")
+  end
+
+  return num, x
+end
+
+local function parse_literal(str, i)
+  local x = next_char(str, i, literals)
+  local word = string.sub(str, i, x - 1)
+  local literal = literals[word]
+  if not literal then
+    decode_error(str, i, "invalid literal '" .. word .. "'")
+  end
+
+  return literal_map[literal], x
+end
+
+local function parse_array(str, i)
+  -- TODO: parse_array
+  local res = {}
+  local n = 1
+  i = i + 1
+  while true do
+    local i = next_char(str, i, space_chars, true)
+    if string.sub(str, i, i) == "]" then
+      i = i + 1
+      break
+    end
+
+    -- x, i = parse(str, i)
+  end
+
+  return res, i
+end
+
+local char_func_map = {
+  ["["] = parse_array,
+  ["{"] = parse_object,
+  ['"'] = parse_string,
+  ["0"] = parse_number,
+  ["1"] = parse_number,
+  ["2"] = parse_number,
+  ["3"] = parse_number,
+  ["4"] = parse_number,
+  ["5"] = parse_number,
+  ["6"] = parse_number,
+  ["7"] = parse_number,
+  ["8"] = parse_number,
+  ["9"] = parse_number,
+  ["-"] = parse_number,
+  ["t"] = parse_literal,
+  ["f"] = parse_literal,
+  ["n"] = parse_literal,
+}
+
+parse = function(str, idx)
+  local char = string.sub(str, idx, idx)
+  local f = char_func_map[char]
+  if not f then
+    decode_error(str, idx, "unexpected character '" .. char .. "'")
+  end
+  return f(str, idx)
+end
+
+function json.decode(str)
+  if type(str) ~= "string" then
+    error("expected argument of type string, got " .. type(str))
+  end
+  local res, idx = parse(str, next_char(str, 1, space_chars, true))
+  idx = next_char(str, idx, space_chars, true)
+  if idx <= #str then
+    decode_error(str, idx, "trailing garbage")
+  end
+
+  return res
+end
+
 function json.encode(val)
   return encode(val)
 end
 
-local test = { 1, 2, 3, { key = 456, key2 = true, key3 = 789 } }
+--- test cases ---
+--
+-- local test = { 1, 2, 3, { key = 456, key2 = true, key3 = 789 } }
 -- local test = { 1, 2, 3 }
 -- local test = { 0, 0, 0 }
 -- local test = {}
+-- local test = { nil, true, false } -- sparse array
+-- local test = { true, false }
 -- local test = { "test1", "test2" }
 -- local test = { key = "test", "test2" }
-local result = json.encode(test)
-print(result)
+-- print(json.encode(test))
+
+print(json.decode("[true, false]"))
