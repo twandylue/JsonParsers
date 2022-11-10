@@ -128,29 +128,40 @@ local function parse_number(str, i)
 end
 
 local function parse_literal(str, i)
-  local x = next_char(str, i, literals)
+  local x = next_char(str, i, delim_chars)
   local word = string.sub(str, i, x - 1)
-  local literal = literals[word]
-  if not literal then
+  if not literals[word] then
     decode_error(str, i, "invalid literal '" .. word .. "'")
   end
 
-  return literal_map[literal], x
+  return literal_map[word], x
 end
 
 local function parse_array(str, i)
-  -- TODO: parse_array
   local res = {}
   local n = 1
   i = i + 1
   while true do
-    local i = next_char(str, i, space_chars, true)
+    local x
+    i = next_char(str, i, space_chars, true)
     if string.sub(str, i, i) == "]" then
       i = i + 1
       break
     end
 
-    -- x, i = parse(str, i)
+    x, i = parse(str, i)
+    res[n] = x
+    n = n + 1
+    i = next_char(str, i, space_chars, true)
+
+    local char = string.sub(str, i, i)
+    i = i + 1
+    if char == "]" then
+      break
+    end
+    if char ~= "," then
+      decode_error(str, i, "expected ']' or ','")
+    end
   end
 
   return res, i
@@ -214,4 +225,8 @@ end
 -- local test = { key = "test", "test2" }
 -- print(json.encode(test))
 
-print(json.decode("[true, false]"))
+-- print(json.decode("[true,false]"))
+print(json.decode("[1,false,2]"))
+for key, value in pairs(json.decode("[1,false,2]")) do
+  print("key: " .. tostring(key) .. ", value: " .. tostring(value))
+end
