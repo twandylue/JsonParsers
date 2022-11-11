@@ -206,6 +206,7 @@ local function parse_object(str, i)
 end
 
 local function parse_string(str, i)
+  -- TODO: should be compatible with utf-8
   local s_start = i + 1
   local s_end = s_start
   while s_end <= #str do
