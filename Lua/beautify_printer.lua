@@ -15,7 +15,6 @@ local function print_literals(val, i, stack)
   else
     stack[i] = tostring(val)
   end
-
   return i + 1
 end
 
@@ -56,7 +55,7 @@ local action_map = {
   ["string"] = print_literals,
   ["number"] = print_literals,
   ["boolean"] = print_literals,
-  ["nil"] = print_nil,
+  ["nil"] = print_nil, -- TODO: print nil
 }
 
 function beautify(val, i, stack)
@@ -78,8 +77,9 @@ local stack = {}
 -- beautify({ key = "test1", key2 = "test2", key3 = { "test1", "test2" } }, 1, stack)
 -- beautify({ key = "test1", key2 = "test2" }, 1, stack)
 -- beautify({ "test1", "test2" }, 1, stack)
-beautify({ "test1", key = "test4", { "test1", "test2" }, key2 = true, { 123, 3456 } }, 1, stack)
+-- beautify({ key4 = nil, "test1", key = "test4", { "test1", "test2" }, key2 = true, { 123, 3456 } }, 1, stack)
 -- beautify({ "test1", key = "test4" }, 1, stack)
+beautify({ nil, nil }, 1, stack) -- TODO: local test = {nil, nil}, #test = 0
 
 local function generate_spaces(i)
   local res = ""
