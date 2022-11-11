@@ -1,14 +1,15 @@
-local function print_string(val, i, stack)
-  if stack[i] then
-    stack[i] = string.format("%s: %s", stack[i], val)
-  else
-    stack[i] = tostring(val)
+local function is_array(t)
+  local i = 0
+  for _ in pairs(t) do
+    i = i + 1
+    if t[i] == nil then
+      return false
+    end
   end
-
-  return i + 1
+  return true
 end
 
-local function print_number(val, i, stack)
+local function print_literals(val, i, stack)
   if stack[i] then
     stack[i] = string.format("%s: %s", stack[i], val)
   else
@@ -29,15 +30,20 @@ local function print_table(val, i, stack)
   i = i + 1
 
   -- array
-  if #val ~= 0 then
+  if is_array(val) then
     for _, value in pairs(val) do
       i = beautify(value, i, stack)
     end
   else
     -- table
     for key, value in pairs(val) do
+      if type(key) == "number" then
+        i = beautify(value, i, stack)
+        goto continue
+      end
       stack[i] = string.format("%s", key)
       i = beautify(value, i, stack)
+      ::continue::
     end
   end
 
@@ -47,10 +53,10 @@ end
 
 local action_map = {
   ["table"] = print_table,
-  ["string"] = print_string,
-  ["number"] = print_number,
+  ["string"] = print_literals,
+  ["number"] = print_literals,
+  ["boolean"] = print_literals,
   ["nil"] = print_nil,
-  ["boolean"] = print_bool,
 }
 
 function beautify(val, i, stack)
@@ -72,11 +78,8 @@ local stack = {}
 -- beautify({ key = "test1", key2 = "test2", key3 = { "test1", "test2" } }, 1, stack)
 -- beautify({ key = "test1", key2 = "test2" }, 1, stack)
 -- beautify({ "test1", "test2" }, 1, stack)
-beautify({ "test1", key = "test4", { "test1", "test2" } }, 1, stack) -- TODO: failed
-
--- for key, val in pairs(stack) do
---   print(key, val)
--- end
+beautify({ "test1", key = "test4", { "test1", "test2" }, key2 = true, { 123, 3456 } }, 1, stack)
+-- beautify({ "test1", key = "test4" }, 1, stack)
 
 local function generate_spaces(i)
   local res = ""
