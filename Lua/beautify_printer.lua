@@ -1,10 +1,8 @@
 local function print_string(val, i, stack)
   if stack[i] then
     stack[i] = string.format("%s: %s", stack[i], val)
-    -- table.insert(stack, i, string.format("%s: %s", stack[i], val))
   else
     stack[i] = tostring(val)
-    -- table.insert(stack, i, tostring(val))
   end
 
   return i + 1
@@ -28,7 +26,6 @@ local function print_table(val, i, stack)
     cur = string.format("%s: {", stack[i])
   end
   stack[i] = cur
-  -- table.insert(stack, i, cur)
   i = i + 1
 
   -- array
@@ -39,14 +36,12 @@ local function print_table(val, i, stack)
   else
     -- table
     for key, value in pairs(val) do
-      -- table.insert(stack, i, string.format("%s", key))
       stack[i] = string.format("%s", key)
       i = beautify(value, i, stack)
     end
   end
 
   stack[i] = "}"
-  -- table.insert(stack, i, "}")
   return i + 1
 end
 
@@ -69,14 +64,15 @@ function beautify(val, i, stack)
 end
 
 local stack = {}
--- printer('{"target", "like", {"test", "test2"}}', 0, stack)
--- printer({ "target", "like", "test", { "test", "test123", 1, { 23, 4 } }, 56, 233 }, 1, stack)
--- printer({ "target" }, 1, stack)
--- printer({ 1, 2 }, 1, stack)
--- printer({ "target", { "like", "test", { "test1", "test2" }, "test3" } }, 1, stack)
--- printer({ key = "test1", key2 = "test2", { "test1", "test2" } }, 1, stack) -- TODO:
-beautify({ key = "test1", key2 = "test2" }, 1, stack)
--- printer({ "test1", "test2" }, 1, stack)
+-- beautify('{"target", "like", {"test", "test2"}}', 0, stack)
+-- beautify({ "target", "like", "test", { "test", "test123", 1, { 23, 4 } }, 56, 233 }, 1, stack)
+-- beautify({ "target" }, 1, stack)
+-- beautify({ 1, 2 }, 1, stack)
+-- beautify({ "target", { "like", "test", { "test1", "test2" }, "test3" } }, 1, stack)
+-- beautify({ key = "test1", key2 = "test2", key3 = { "test1", "test2" } }, 1, stack)
+-- beautify({ key = "test1", key2 = "test2" }, 1, stack)
+-- beautify({ "test1", "test2" }, 1, stack)
+beautify({ "test1", key = "test4", { "test1", "test2" } }, 1, stack) -- TODO: failed
 
 -- for key, val in pairs(stack) do
 --   print(key, val)
