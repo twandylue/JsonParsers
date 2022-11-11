@@ -168,7 +168,6 @@ local function parse_array(str, i)
   return res, i
 end
 
--- TODO: parse_object
 local function parse_object(str, i)
   local res = {}
   i = i + 1
@@ -204,6 +203,19 @@ local function parse_object(str, i)
   end
 
   return res, i
+end
+
+local function parse_string(str, i)
+  local s_start = i + 1
+  local s_end = s_start
+  while s_end <= #str do
+    if string.sub(str, s_end, s_end) == '"' then
+      return string.sub(str, s_start, s_end - 1), s_end + 1
+    end
+    s_end = s_end + 1
+  end
+
+  decode_error(str, i, "expected closing quote for string")
 end
 
 local char_func_map = {
@@ -260,12 +272,11 @@ end
 -- local test = {}
 -- local test = { nil, true, false } -- sparse array
 -- local test = { true, false }
--- local test = { "test1", "test2" }
 -- local test = { key = "test", "test2" }
--- print(json.encode(test))
+local test = { "test1", "test2", { key1 = 123, key2 = 321 }, { key3 = { key4 = { key5 = 1000 } } } }
+local encode_val = json.encode(test)
+-- local decode_val = json.decode('"' .. encode_val .. '"')
 
--- print(json.decode("[true,false]"))
-print(json.decode("[1,false,2]"))
-for key, value in pairs(json.decode("[1,false,2]")) do
-  print("key: " .. tostring(key) .. ", value: " .. tostring(value))
-end
+print("encode: \n" .. encode_val)
+print("decode:")
+print(json.decode('{"test1": "test2", "value": [true]}'), 1)
