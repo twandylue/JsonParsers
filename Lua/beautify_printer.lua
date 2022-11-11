@@ -64,7 +64,7 @@ function beautify(val, i, stack)
 end
 
 local stack = {}
--- beautify('{"target", "like", {"test", "test2"}}', 0, stack)
+-- beautify({ "target", "like", { "test", "test2" } }, 1, stack)
 -- beautify({ "target", "like", "test", { "test", "test123", 1, { 23, 4 } }, 56, 233 }, 1, stack)
 -- beautify({ "target" }, 1, stack)
 -- beautify({ 1, 2 }, 1, stack)
@@ -88,7 +88,7 @@ end
 
 local c = 0
 for _, val in ipairs(stack) do
-  if val == "{" then
+  if string.find(val, "{") then
     print(generate_spaces(c) .. val)
     c = c + 1
   elseif val == "}" then
@@ -98,10 +98,3 @@ for _, val in ipairs(stack) do
     print(generate_spaces(c) .. val .. ",")
   end
 end
-
--- -- local index, value = nil, nil
--- -- index, value = next(stack)
--- -- while index ~= nil do
--- --   print(index, value)
--- --   index, value = next(stack, index)
--- -- end
